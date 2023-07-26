@@ -27,6 +27,14 @@ cartRouter.get("/:id", async (req, res) => {
 
 cartRouter.post("/add", async (req, res) => {
     const { user, products } = req.body
+    // { sample data
+    //     "user": "64c0d67f13dc2b127d395787",
+    //         "products": [
+    //             {
+    //                 "_id": "64c0b37d7c304643d2554a93"
+    //             }
+    //         ]
+    // }
     try {
         const items = await CartModel.findOne({ user });
         if (items) {
@@ -38,8 +46,6 @@ cartRouter.post("/add", async (req, res) => {
             await cart.save();
             res.status(200).json({ "msg": "Added to cart" });
         }
-        res.send("data");
-
     } catch (error) {
         console.log(error);
         res.status(400).json({ "msg": "Error in adding items to cart" });
@@ -50,18 +56,41 @@ cartRouter.patch("/update/:user_id", async (req, res) => {
     const { product } = req.body;
     const user_id = req.params.user_id;
     try {
-        const data = await CartModel.find({ user: user_id });
-        const products = data[0].products.filter((item) => {
-            return item != product;
+        const data = await CartModel.findOne({ user: user_id });
+        const products = data.products.filter((item) => {
+            return item._id != product;
         });
-        // console.log(data);
         const payload = {
-            ...data[0]._doc,
+            ...data._doc,
             products
         }
-        console.log(payload);
-        await CartModel.findByIdAndUpdate({ "_id": data[0]._id }, payload);
+        // console.log(payload);
+        await CartModel.findByIdAndUpdate({ "_id": data._id }, payload);
         res.status(200).json({ "msg": "cart updated successfully" });
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ "msg": "Error updating" })
+    }
+})
+
+cartRouter.patch("/updateQuantity/:user_id", async (req, res) => {
+    const { product, action } = req.body;
+    const user_id = req.params.user_id;
+    try {
+        const data = await CartModel.findOne({ user: user_id });
+        const target = data.products.filter((item) => {
+            return item._id == product;
+        });
+        if (action == "+") {
+            target[0].quantity++;
+        } else if (action == "-") {
+            target[0].quantity--;
+        } else {
+            res.send("Invalid Action");
+        }
+
+        await CartModel.findByIdAndUpdate({ "_id": data._id }, data);
+        res.status(200).json({ "msg": "item updated successfully" });
     } catch (error) {
         console.log(error)
         res.status(400).json({ "msg": "Error updating" })

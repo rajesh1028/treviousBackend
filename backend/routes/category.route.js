@@ -34,7 +34,7 @@ categoryRouter.post("/add", async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        res.status(400).json({ "msg": "Error in adding items to cart" });
+        res.status(400).json({ "msg": "Error in adding category" });
     }
 })
 
