@@ -5,6 +5,7 @@ const { userRouter } = require("./routes/user.route")
 const { categoryRouter } = require("./routes/category.route");
 const { productRouter } = require("./routes/product.route");
 const { cartRouter } = require("./routes/cart.route");
+const { orderRouter } = require("./routes/order.route");
 
 const PORT = process.env.PORT || 4500;
 const app = express();
@@ -19,6 +20,7 @@ app.use("/user", userRouter);
 app.use("/category", categoryRouter);
 app.use("/product", productRouter);
 app.use("/cart", cartRouter);
+app.use("/order", orderRouter);
 
 app.listen(PORT, async () => {
     try {
